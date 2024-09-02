@@ -13,6 +13,7 @@ app.get("/likes", async (req,res) => {
         const likeCount = await getLiveVideoLikes(liveVideoId, API_KEY);
         console.log(`Current live stream like count: ${likeCount}`);
         res.send(likeCount);
+        return;
     } 
     res.send("API NOT WORKING")
 })
