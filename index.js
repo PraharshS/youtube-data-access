@@ -4,8 +4,6 @@ require('dotenv').config();;
 const PORT = 8080;
 const API_KEY = process.env.API_KEY;
 const CHANNEL_ID = process.env.CHANNEL_ID;
-const url = "https://youtube.googleapis.com/youtube/v3/activities?part=snippet&key=AIzaSyBuHIX4xlHOXul3Bfm_K3c5k4EnlbBH4c4&channelId=UC5VS-zNNKnjncSNJhkE48Bg";
-const url2 = "https://www.googleapis.com/youtube/v3/videos?part=statistics&id=MTUxNzI1MjU5ODIyMTcyNTI1OTgyMjAwMDU5Mw&key=AIzaSyBuHIX4xlHOXul3Bfm_K3c5k4EnlbBH4c4";
 
 app.get("/likes", async (req,res) => {
     const liveVideoId = await getLiveVideoId(CHANNEL_ID, API_KEY);
@@ -18,14 +16,7 @@ app.get("/likes", async (req,res) => {
     } 
     res.send("API NOT WORKING")
 })
-const fetchLive = () => {
-    axios.get(url).then(res => {
-        console.log(res.data);
-    })
-    axios.get(url2).then(res => {
-        console.log(res.data);
-    })
-}
+
 // Step 1: Fetch the Live Video ID from the Channel
 async function getLiveVideoId(channelId, apiKey) {
     const searchUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${channelId}&eventType=live&type=video&key=${apiKey}`;    
