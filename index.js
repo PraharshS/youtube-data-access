@@ -18,6 +18,15 @@ app.get("/likes", async (req,res) => {
     res.send("API NOT WORKING")
 })
 
+app.get("/shorts", async (req,res) => {
+    const recentShort = await getRecentShort(CHANNEL_ID, API_KEY);
+    if(recentShort) {
+        res.send(recentShort);
+        return;
+    }
+    res.send("API NOT WORKING")
+})
+
 // Step 1: Fetch the Live Video ID from the Channel
 async function getLiveVideoId(channelId, apiKey) {
     const searchUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${channelId}&eventType=live&type=video&key=${apiKey}`;    
@@ -36,6 +45,33 @@ async function getLiveVideoId(channelId, apiKey) {
         return null;
     }
 }
+
+async function getRecentShort(channelId, apiKey) {
+    const response = await fetch(
+      `https://www.googleapis.com/youtube/v3/search?key=${apiKey}&channelId=${channelId}&part=snippet&type=video&order=date&maxResults=5`
+    );
+    const data = await response.json();
+  
+    // Fetch details for each video to check duration
+    for (const item of data.items) {
+      const videoId = item.id.videoId;
+      
+      const videoDetails = await fetch(
+        `https://www.googleapis.com/youtube/v3/videos?key=${apiKey}&id=${videoId}&part=contentDetails`
+      );
+      const videoData = await videoDetails.json();
+      
+      const duration = videoData.items[0].contentDetails.duration;
+      
+      // YouTube uses ISO 8601 format for duration; PT1M means 1 minute (i.e., 60 seconds or less is a Short)
+      if (duration === "PT1M" || duration.includes("PT") && duration.replace(/\D/g, '') <= 60) {
+        return `https://www.youtube.com/shorts/${videoId}`;
+      }
+    }
+    
+    return "No recent short video found.";
+  }
+  
 // Step 2: Fetch the Like Count of the Live Video
 async function getLiveVideoLikes(videoId, apiKey) {
     const statsUrl = `https://www.googleapis.com/youtube/v3/videos?part=statistics&id=${videoId}&key=${apiKey}`;
