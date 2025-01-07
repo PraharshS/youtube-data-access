@@ -19,7 +19,7 @@ app.get("/likes", async (req,res) => {
 })
 
 app.get("/shorts", async (req,res) => {
-    const recentShort = await getRecentShort(CHANNEL_ID, API_KEY);
+    const recentShort = await getRecentShort();
     if(recentShort) {
         res.send(recentShort);
         return;
@@ -28,8 +28,8 @@ app.get("/shorts", async (req,res) => {
 })
 
 // Step 1: Fetch the Live Video ID from the Channel
-async function getLiveVideoId(channelId, apiKey) {
-    const searchUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${channelId}&eventType=live&type=video&key=${apiKey}`;    
+async function getLiveVideoId() {
+    const searchUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${CHANNEL_ID}&eventType=live&type=video&key=${API_KEY}`;    
     try {
         const response = await axios.get(searchUrl);
         const items = response.data.items;
@@ -46,9 +46,9 @@ async function getLiveVideoId(channelId, apiKey) {
     }
 }
 
-async function getRecentShort(channelId, apiKey) {
+async function getRecentShort() {
     const response = await fetch(
-      `https://www.googleapis.com/youtube/v3/search?key=${apiKey}&channelId=${channelId}&part=snippet&type=video&order=date&maxResults=5`
+      `https://www.googleapis.com/youtube/v3/search?key=${API_KEY}&channelId=${CHANNEL_ID}&part=snippet&type=video&order=date&maxResults=5`
     );
     const data = await response.json();
   
@@ -57,7 +57,7 @@ async function getRecentShort(channelId, apiKey) {
       const videoId = item.id.videoId;
       
       const videoDetails = await fetch(
-        `https://www.googleapis.com/youtube/v3/videos?key=${apiKey}&id=${videoId}&part=contentDetails`
+        `https://www.googleapis.com/youtube/v3/videos?key=${API_KEY}&id=${videoId}&part=contentDetails`
       );
       const videoData = await videoDetails.json();
       
@@ -73,8 +73,8 @@ async function getRecentShort(channelId, apiKey) {
   }
   
 // Step 2: Fetch the Like Count of the Live Video
-async function getLiveVideoLikes(videoId, apiKey) {
-    const statsUrl = `https://www.googleapis.com/youtube/v3/videos?part=statistics&id=${videoId}&key=${apiKey}`;
+async function getLiveVideoLikes(videoId) {
+    const statsUrl = `https://www.googleapis.com/youtube/v3/videos?part=statistics&id=${videoId}&key=${API_KEY}`;
     
     try {
         const response = await axios.get(statsUrl);
