@@ -1,12 +1,12 @@
 const app = require("express")();
 const axios = require("axios")
 require('dotenv').config();;
-const PORT = 8080;
+const PORT = 3002   ;
 const API_KEY = process.env.API_KEY;
 const CHANNEL_ID = process.env.CHANNEL_ID;
 
 app.get("/likes", async (req,res) => {
-    const liveVideoId = await getLiveVideoId(CHANNEL_ID, API_KEY);
+    const liveVideoId = await getLiveVideoId();
 
     if (liveVideoId) {
         // Fetch Like Count
@@ -26,6 +26,12 @@ app.get("/shorts", async (req,res) => {
     }
     res.send("API NOT WORKING")
 })
+
+async function getLiveChatUrl() {
+    const liveId = await getLiveVideoId();
+    const chatUrl = `https://www.youtube.com/live_chat?is_popout=1&v=${liveId}`;
+    return chatUrl;
+}
 
 // Step 1: Fetch the Live Video ID from the Channel
 async function getLiveVideoId() {
